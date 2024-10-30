@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>I'm Sorry</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Lobster&display=swap');
+
+    body {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      height: 100vh;
+      margin: 0;
+      overflow: hidden;
+      font-family: 'Lobster', cursive;
+      background: radial-gradient(circle, #ffe5e5, #ffb3b3, #ff8080);
+    }
+
+    #sorryMessage {
+      margin-top: 20px;
+      font-size: 36px;
+      color: #fff;
+      text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.2);
+    }
+  </style>
+</head>
+<body>
+  <div id="sorryMessage">I'm sorry ❤️</div>
+
+  <!-- Include Three.js from CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script>
+    // Set up the scene, camera, and renderer
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    document.body.appendChild(renderer.domElement);
+
+    // Heart Shape with smoother, more rounded curves
+    const heartShape = new THREE.Shape();
+    const x = 0, y = 0;
+    heartShape.moveTo(x + 0, y + 0);
+    heartShape.bezierCurveTo(x + 0, y + 3, x - 3, y + 3, x - 3, y + 0);
+    heartShape.bezierCurveTo(x - 3, y - 3, x + 0, y - 5, x + 0, y - 6);
+    heartShape.bezierCurveTo(x + 0, y - 5, x + 3, y - 3, x + 3, y + 0);
+    heartShape.bezierCurveTo(x + 3, y + 3, x + 0, y + 3, x + 0, y + 0);
+
+    // Extrude the heart shape to give it 3D depth
+    const extrudeSettings = {
+      steps: 2,
+      depth: 0.6,
+      bevelEnabled: true,
+      bevelThickness: 0.2,
+      bevelSize: 0.25,
+      bevelOffset: 0,
+      bevelSegments: 5
+    };
+    const geometry = new THREE.ExtrudeGeometry(heartShape, extrudeSettings);
+    const material = new THREE.MeshStandardMaterial({ color: 0xff5a5a, metalness: 0.5, roughness: 0.2 });
+    const heart = new THREE.Mesh(geometry, material);
+    scene.add(heart);
+
+    // Soft Ambient Lighting
+    const ambientLight = new THREE.AmbientLight(0xffe6e6, 0.8); // soft pink ambient light
+    scene.add(ambientLight);
+
+    // Point light to add depth and highlights to the heart
+    const pointLight = new THREE.PointLight(0xffffff, 1);
+    pointLight.position.set(5, 5, 5);
+    scene.add(pointLight);
+
+    // Position the camera
+    camera.position.z = 5;
+
+    // Track the mouse position and calculate rotation
+    let mouseX = 0;
+    let mouseY = 0;
+    document.addEventListener('mousemove', (event) => {
+      // Normalize the mouse position (-1 to 1) relative to the center of the screen
+      mouseX = (event.clientX / window.innerWidth) * 2 - 1;
+      mouseY = -(event.clientY / window.innerHeight) * 2 + 1;
+    });
+
+    // Animate the heart
+    function animate() {
+      requestAnimationFrame(animate);
+      // Rotate heart in sync with mouse position
+      heart.rotation.y = mouseX * Math.PI / 6; // horizontal rotation
+      heart.rotation.x = mouseY * Math.PI / 6; // vertical rotation
+      renderer.render(scene, camera);
+    }
+
+    animate();
+
+    // Handle window resize
+    window.addEventListener('resize', () => {
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+    });
+  </script>
+</body>
+</html>
